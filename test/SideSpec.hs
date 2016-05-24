@@ -4,8 +4,13 @@ import Test.Hspec
 
 import  Side
 
+side1 :: Side
 side1 = A [True, False, True]
+
+side2 :: Side
 side2 = A [False, True, False]
+
+side3 :: Side
 side3 = A [True, False, False]
 
 spec :: Spec

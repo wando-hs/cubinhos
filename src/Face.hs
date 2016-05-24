@@ -1,4 +1,4 @@
-module Face (Face (..), matchSide, matchFace, toArray, fromArray) where
+module Face (Face (..), matchSide, matchFace, hlenght, vlenght) where
 
 import qualified Side as S
 

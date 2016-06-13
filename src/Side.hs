@@ -14,4 +14,4 @@ raw (C s) = s
 raw (D s) = s
 
 match :: Side -> Side -> Bool
-match s1 s2 = all (uncurry xor) $ zip (raw s1) (raw s2)
+match s1 s2 = all (uncurry xor) $ zip (raw s1) (reverse $ raw s2)

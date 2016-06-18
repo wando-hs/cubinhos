@@ -37,6 +37,10 @@ test-suite spec
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       Stubs
+                     , LibSpec
+                     , FaceSpec
+                     , SideSpec
   build-depends:       base
                      , cubinhos
                      , hspec

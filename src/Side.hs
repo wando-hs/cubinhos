@@ -14,4 +14,5 @@ raw (C s) = s
 raw (D s) = s
 
 match :: Side -> Side -> Bool
-match s1 s2 = all (uncurry xor) $ zip (raw s1) (reverse $ raw s2)
+match s1 s2 = all (uncurry xor) $ zip (middle s1) (reverse $ middle s2)
+    where middle = init . tail . raw

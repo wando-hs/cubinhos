@@ -1,8 +1,9 @@
-module Face (Face (..), matchSide, matchFace, hlenght, vlenght) where
+module Face (Face (..), matches,match,fullSide, hlenght, vlenght) where
 
 import qualified Side as S
+import Side (Side(..))
 
-data Face = Face S.Side S.Side S.Side S.Side
+data Face = Face Side Side Side Side
     deriving (Eq)
 
 instance Show Face where
@@ -14,10 +15,10 @@ instance Read Face where
         where readData = fromArray . map (map read . words) . lines
 
 fromArray :: [[Bool]] -> Face
-fromArray face = Face (S.A $ head face)
-                      (S.B $ map last face)
-                      (S.C $ reverse $ last face)
-                      (S.D $ reverse $ map head face)
+fromArray face = Face (A $ head face)
+                      (B $ map last face)
+                      (C $ reverse $ last face)
+                      (D $ reverse $ map head face)
 
 toArray :: Face -> [[Bool]]
 toArray face@(Face a b c d) = [S.raw a] ++ from center ++ [reverse $ S.raw c]
@@ -31,12 +32,38 @@ hlenght (Face a _ _ _) = length $ S.raw a
 vlenght :: Face -> Int
 vlenght (Face _ b _ _) = length $ S.raw b
 
-sides :: Face -> [S.Side]
+sides :: Face -> [Side]
 sides (Face a b c d) = [a, b, c, d]
 
-matchSide :: Face -> S.Side -> [S.Side]
-matchSide face side = filter (S.match side) $ sides face
+type FullSide = (Bool, Side, Bool)
 
-matchFace :: Face -> Face -> [(S.Side, S.Side)]
-matchFace f1 f2 = concatMap joinMatches $ sides f2
-    where joinMatches side = map (\ s -> (s, side)) $  matchSide f1 side
+side :: FullSide -> Side
+side (_, s, _) = s
+
+topPenultimate :: Side -> Bool
+topPenultimate = last . init . S.raw
+
+bottomPenultimate :: Side -> Bool
+bottomPenultimate = head . tail . S.raw
+
+matchBorder :: Bool -> Bool -> Bool -> Bool -> Bool
+matchBorder p q r s = (not q) && r || not (r || (s && p && not q))
+
+match :: FullSide -> FullSide -> Bool
+match (a, side, c) (a2, side2, c2) = middle && top && bottom
+    where top = matchBorder a (head $ S.raw side) (last $ S.raw side2) c2
+          middle = S.match side side2
+          bottom = matchBorder c (last $ S.raw side) (head $ S.raw side2) a2
+
+fullSide :: Face -> Side -> FullSide
+fullSide (Face a b _ d) (A _) = (topPenultimate d, a, bottomPenultimate b)
+fullSide (Face a b c _) (B _) = (topPenultimate a, b, bottomPenultimate c)
+fullSide (Face _ b c d) (C _) = (topPenultimate b, c, bottomPenultimate d)
+fullSide (Face a _ c d) (D _) = (topPenultimate c, d, bottomPenultimate a)
+
+matchSide :: Face -> FullSide -> [Side]
+matchSide face fside = map side $ filter (match fside) $ map (fullSide face) $ sides face
+
+matches :: Face -> Face -> [(Side, Side)]
+matches f1 f2 = concatMap joinMatches $ sides f2
+    where joinMatches side = map (\ s -> (s, side)) $  matchSide f1 $ fullSide f2 side

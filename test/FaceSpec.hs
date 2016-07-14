@@ -31,10 +31,6 @@ spec =
         show face `shouldBe` faceText
     it "should parse a face" $ do
         read faceText `shouldBe` face
-    it "PIROCAww" $ do
-        shouldBe (fullSide face3 d3) (True,d3,False)
-    it "PIROCA" $ do
-        shouldBe (Face.match (True,d3,False) (True,a4,True)) False
     it "should match complementary sides between faces" $ do
         matches face3 face4 `shouldMatchList` [(a3, b4), (a3, d4),
                                                (b3, b4),
